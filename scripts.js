@@ -1,4 +1,4 @@
-const myLibrary = [
+const bookList = [
     { 
         name: "To Kill a Mockingbird", 
         author: "Harper Lee", 
@@ -122,147 +122,136 @@ const myLibrary = [
     // Add more book objects as needed
 ];
 
+class Book {
+    constructor(name, author, numberOfPages, readStatus) {
+        this.name = name;
+        this.author = author;
+        this.numberOfPages = numberOfPages;
+        this.readStatus = readStatus;
+    }
 
-
-const modal = document.querySelector("#modal");
-const openModal = document.querySelector(".open-button");
-const closeModal = document.querySelector(".close-button");
-
-openModal.addEventListener("click", () => {
-  modal.showModal();
-});
-
-closeModal.addEventListener("click", () => {
-  modal.close();
-});
-
-function Book(name, author,numberOfPages,readStatus) {
-    this.name = name;
-    this.author = author;
-    this.numberOfPages = numberOfPages;
-    this.readStatus = readStatus;
-  // the constructor...
-}
-
-function addBookToLibrary(newBook) {
-  // do stuff here  take user’s input and store the new book objects into an array
-  myLibrary.push(newBook)
-}
-
-const display = document.querySelector('.display')
-
-function makecard(book){
-    const card = document.createElement('div');
-    card.classList.add('card');
-    card.id = i
-
-    const top = document.createElement('div');
-    top.classList.add('top');
-
-    const namediv = document.createElement('div');
-    namediv.classList.add('name');
-    namediv.textContent = book.name;
-
-    const authordiv = document.createElement('div');
-    authordiv.classList.add('author');
-    authordiv.textContent = book.author;
-
-    const numberOfPagesdiv = document.createElement('div');
-    numberOfPagesdiv.classList.add('numberOfPages');
-    numberOfPagesdiv.textContent = book.numberOfPages + ' pages';
-    
-    top.appendChild(namediv);
-    top.appendChild(authordiv);
-    top.appendChild(numberOfPagesdiv);
-
-    const bottom = document.createElement('div');
-    bottom.classList.add('bottom');
-
-    const readStatusdiv = document.createElement('button');
-    readStatusdiv.classList.add('readStatus');
-    readStatusdiv.textContent = book.readStatus ? 'read' : 'unread';
-
-    const removediv = document.createElement('button');
-    removediv.classList.add('remove');
-    removediv.textContent = 'remove'
-
-    bottom.appendChild(readStatusdiv);
-    bottom.appendChild(removediv);
-
-    card.appendChild(top);
-    card.appendChild(bottom);
-    
-    return card;
-}
-
-
-for (i=0;i<myLibrary.length;i++){
-    const newcard = makecard(myLibrary[i])
-    display.appendChild(newcard)
-};
-
-
-
-const status = document.querySelectorAll(".readStatus");
-
-Array.from(
-    status).forEach(
-    (element)=>{
-      element.addEventListener(
-        "click",()=>{
-            const index = element.parentNode.parentNode.id;
-            myLibrary[index].readStatus = !myLibrary[index].readStatus;
-            element.textContent = myLibrary[index].readStatus ? 'read' : 'unread';
-    
-        }); 
-
-})
-
-const removes = document.querySelectorAll(".remove");
-
-Array.from(
-    removes).forEach(
-    (element)=>{
-      element.addEventListener(
-        "click",()=>{
-            const cardToRemove = element.parentNode.parentNode; 
-            const index = cardToRemove.id;
-            myLibrary.splice(i, 1);
-            // Get the i-th card
-            console.log(cardToRemove)
-            display.removeChild(cardToRemove);
-}
-        ); 
-
-})
-
-
-
-function handleSubmit(event) {
-    event.preventDefault(); // Prevent form submission
-
-    // Get form inputs, make a book object.
-    newbook = new Book(document.getElementById('name').value,
-    document.getElementById('author').value,
-    document.getElementById('numberOfPages'),
-    document.querySelector('.form input[type="checkbox"]').checked
-    )
-   
-    
-    // Create a new element to display the submitted content
-    const newcard = makecard(newbook)
-    myLibrary.push(newbook)
-    // Append the new element to the end of the display zone
-    display.appendChild(newcard);
-    
-
-    // Reset the form fields (optional)
-    event.target.reset();
-    modal.close();
+    toggleReadStatus() {
+        this.readStatus = !this.readStatus;
+    }
 }
 
 
 
+//To initialize the library with the provided bookList, you can modify the Library class constructor to accept an optional parameter for the initial list of books. Here's how you can do it:
 
+class Library {
+    constructor(books = []) {
+        this.books = [];
+        this.display = document.querySelector('.display');
+        this.modal = document.querySelector('#modal');
+        this.openModalButton = document.querySelector('.open-button');
+        this.closeModalButton = document.querySelector('.close-button');
 
+        this.openModalButton.addEventListener('click', () => {
+            this.modal.showModal();
+        });
 
+        this.closeModalButton.addEventListener('click', () => {
+            this.modal.close();
+        });
+
+        // Add initial books to the library
+        books.forEach(book => {
+            this.addBook(book);
+        });
+    }
+
+    addBook(book) {
+        this.books.push(book);
+        this.displayBook(book);
+    }
+
+    removeBook(book) {
+        const index = this.books.indexOf(book);
+        if (index !== -1) {
+            this.books.splice(index, 1);
+            this.display.removeChild(book.cardElement);
+        }
+    }
+
+    displayBook(book) {
+        const card = this.makeCard(book);
+        book.cardElement = card;
+        this.display.appendChild(card);
+    }
+
+    makeCard(book) {
+        const card = document.createElement('div');
+        card.classList.add('card');
+
+        const top = document.createElement('div');
+        top.classList.add('top');
+
+        const namediv = document.createElement('div');
+        namediv.classList.add('name');
+        namediv.textContent = book.name;
+
+        const authordiv = document.createElement('div');
+        authordiv.classList.add('author');
+        authordiv.textContent = book.author;
+
+        const numberOfPagesdiv = document.createElement('div');
+        numberOfPagesdiv.classList.add('numberOfPages');
+        numberOfPagesdiv.textContent = book.numberOfPages + ' pages';
+
+        top.appendChild(namediv);
+        top.appendChild(authordiv);
+        top.appendChild(numberOfPagesdiv);
+
+        const bottom = document.createElement('div');
+        bottom.classList.add('bottom');
+
+        const readStatusButton = document.createElement('button');
+        readStatusButton.classList.add('readStatus');
+        readStatusButton.textContent = book.readStatus ? 'read' : 'unread';
+        readStatusButton.addEventListener('click', () => {
+            book.toggleReadStatus();
+            readStatusButton.textContent = book.readStatus ? 'read' : 'unread';
+        });
+
+        const removeButton = document.createElement('button');
+        removeButton.classList.add('remove');
+        removeButton.textContent = 'remove';
+        removeButton.addEventListener('click', () => {
+            this.removeBook(book);
+        });
+
+        bottom.appendChild(readStatusButton);
+        bottom.appendChild(removeButton);
+
+        card.appendChild(top);
+        card.appendChild(bottom);
+
+        return card;
+    }
+
+    handleSubmit(event) {
+        event.preventDefault();
+        const name = document.getElementById('name').value;
+        const author = document.getElementById('author').value;
+        const numberOfPages = document.getElementById('numberOfPages').value;
+        const readStatus = document.querySelector('.form input[type="checkbox"]').checked;
+        const newBook = new Book(name, author, numberOfPages, readStatus);
+        this.addBook(newBook);
+        event.target.reset();
+        this.modal.close();
+    }
+
+    initializeWithBookList(bookList) {
+        bookList.forEach(bookInfo => {
+            const book = new Book(bookInfo.name, bookInfo.author, bookInfo.numberOfPages, bookInfo.readStatus);
+            this.addBook(book);
+        });
+    }
+}
+
+const myLibrary = new Library();
+myLibrary.initializeWithBookList(bookList);
+
+// Add event listener to form submission
+document.querySelector('.form').addEventListener('submit', (event) => myLibrary.handleSubmit(event));
